@@ -1,0 +1,188 @@
+openapi: 3.0.0
+info:
+  title: PD API
+  description: PD API
+  contact:
+    email: name@mail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0-oas3
+servers:
+- url: /
+tags:
+- name: developers
+  description: Operations available to regular developers
+paths:
+  /experiment/{expID}/{executionID}/perfDiagnosis:
+    get:
+      tags:
+      - developers
+      summary: request the report for a performance diagnosis
+      description: |
+        Retrieves the report of the Performance Diagnosis for the requested experiment
+      operationId: performanceDiagnosisReport
+      parameters:
+      - name: expID
+        in: path
+        description: |
+          Identifier of experiment
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: executionID
+        in: path
+        description: |
+          Identifier of execution
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "201":
+          description: report found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/perfDiagRequest'
+        "400":
+          description: experiment with expID not found
+    post:
+      tags:
+      - developers
+      summary: request a performance diagnosis
+      description: |
+        Executes Performance Diagnosis for the requested experiment
+      operationId: performanceDiagnosisReq
+      parameters:
+      - name: expID
+        in: path
+        description: |
+          Identifier of experiment
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: executionID
+        in: path
+        description: |
+          Identifier of execution
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/perfDiagRequest'
+      responses:
+        "201":
+          description: request accepted
+        "400":
+          description: experiment with expID not found
+        "409":
+          description: an existing request already exists
+    delete:
+      tags:
+      - developers
+      summary: delete the performance diagnosis report
+      description: |
+        Removes the report of the Performance Diagnosis for the requested experiment
+      operationId: performanceDiagnosisRemove
+      parameters:
+      - name: expID
+        in: path
+        description: |
+          Identifier of experiment
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: executionID
+        in: path
+        description: |
+          Identifier of execution
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "201":
+          description: report removed
+        "400":
+          description: experiment with expID not found
+  /experiment/{expID}/{executionID}/perfDiagnosis/status:
+    get:
+      tags:
+      - developers
+      summary: request the status of the performance diagnosis request
+      description: |
+        Retrieves the status of the Performance Diagnosis for the requested experiment
+      operationId: performanceDiagnosisStatus
+      parameters:
+      - name: expID
+        in: path
+        description: |
+          Identifier of experiment
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: executionID
+        in: path
+        description: |
+          Identifier of execution
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "201":
+          description: status found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/perfDiagStatus'
+        "400":
+          description: experiment with expID not found
+components:
+  schemas:
+    perfDiagRequest:
+      required:
+      - expID
+      - status
+      type: object
+      properties:
+        expID:
+          type: string
+          format: uuid
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+        status:
+          type: array
+          items:
+            $ref: '#/components/schemas/perfDiagStatus'
+    perfDiagStatus:
+      required:
+      - name
+      type: object
+      properties:
+        executionID:
+          type: string
+          format: uuid
+          example: f27f9d86-7ea0-41e7-b320-7b4ab47d70fe
+        status:
+          type: string
+          example: processing
+        report:
+          type: string
+          example: "null"
